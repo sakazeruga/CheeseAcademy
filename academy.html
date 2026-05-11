@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Academy — チーズを、科学する。| Cheese Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=JetBrains+Mono&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#FDFDF5;--parchment-2:#F6F1E3;--cream:#F3E5AB;--cream-soft:#EFE5C8;
+    --bordeaux:#4A0404;--bordeaux-2:#6B0F0F;--amber:#D4A017;--amber-2:#B58410;
+    --ink:#1A1410;--ink-2:#3A3028;--mute:#8A7E6C;--rule:#C9BFA6;--rule-soft:#E6DFCA;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--parchment);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt";}
+  .serif{font-family:"Cormorant Garamond",serif;font-weight:400;letter-spacing:.01em}
+  .serif-jp{font-family:"Noto Serif JP",serif;font-weight:400}
+  .mono{font-family:"JetBrains Mono",monospace;letter-spacing:.04em}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.35;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55 0 0 0 0 .5 0 0 0 0 .4 0 0 0 .06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+</style>
+<script src="js/react.development.js"></script>
+<script src="js/react-dom.development.js"></script>
+<script src="js/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const btnFilled = { background:"var(--bordeaux)",color:"var(--parchment)",border:"none",padding:"11px 20px",fontSize:12,letterSpacing:".12em",cursor:"pointer",fontFamily:"'Noto Sans JP',sans-serif",fontWeight:500 };
+const btnGhost  = { background:"transparent",color:"var(--ink)",border:"1px solid var(--ink)",padding:"10px 18px",fontSize:12,letterSpacing:".12em",cursor:"pointer",fontFamily:"'Noto Sans JP',sans-serif",fontWeight:500 };
+
+const SectionMark = ({ n, label }) =>
+  <div className="mono" style={{ fontSize:11,letterSpacing:".24em",textTransform:"uppercase",color:"var(--bordeaux)",display:"flex",alignItems:"center",gap:14 }}>
+    <span style={{ fontWeight:500 }}>§{n}</span>
+    <span style={{ width:28,height:1,background:"var(--bordeaux)",opacity:.5 }} />
+    <span style={{ color:"var(--ink-2)" }}>{label}</span>
+  </div>;
+
+function Logo({ dark = false }) {
+  return (
+    <a href="index.html" style={{ textDecoration:"none",display:"flex",alignItems:"center",gap:12 }}>
+      <div style={{ width:40,height:40,border:"1px solid "+(dark?"rgba(253,253,245,.5)":"var(--ink)"),display:"grid",placeItems:"center",fontFamily:"Cormorant Garamond, serif",fontSize:26,fontWeight:500,color:dark?"var(--parchment)":"var(--ink)" }}>C</div>
+      <div style={{ lineHeight:1.1 }}>
+        <div className="serif" style={{ fontSize:18,letterSpacing:".02em",color:dark?"var(--parchment)":"var(--ink)" }}>Cheese Academy</div>
+        <div className="mono" style={{ fontSize:9,letterSpacing:".28em",color:dark?"rgba(253,253,245,.6)":"var(--mute)" }}>TOKYO · TERROIR · TECH</div>
+      </div>
+    </a>
+  );
+}
+
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", on); on();
+    return () => window.removeEventListener("scroll", on);
+  }, []);
+  const links = [["§01","Market","index.html#s01"],["§02","Pillars","index.html#s02"],["§03","For You","index.html#s03"],["§04","AI Mentor","index.html#s04"],["§05","Journal","index.html#s05"]];
+  return (
+    <div style={{ position:"fixed",top:0,left:0,right:0,zIndex:50,transition:"all .35s ease",background:scrolled?"rgba(253,253,245,.92)":"transparent",backdropFilter:scrolled?"blur(10px)":"none",borderBottom:scrolled?"1px solid var(--rule-soft)":"1px solid transparent" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto",padding:"18px 48px",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+        <Logo />
+        <nav style={{ display:"flex",gap:36,alignItems:"center" }}>
+          {links.map(([k,l,href]) =>
+            <a key={l} href={href} style={{ textDecoration:"none",color:"var(--ink-2)",fontSize:13,display:"flex",gap:8,alignItems:"baseline" }}>
+              <span className="mono" style={{ fontSize:10,color:"var(--bordeaux)",opacity:.7 }}>{k}</span>
+              <span>{l}</span>
+            </a>
+          )}
+        </nav>
+        <div style={{ display:"flex",gap:10 }}>
+          <button style={btnGhost}>ログイン</button>
+          <button style={btnFilled}>無料で始める →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Hero() {
+  return (
+    <section style={{ minHeight:"80vh",padding:"160px 48px 120px",background:"linear-gradient(180deg,var(--parchment) 0%,var(--parchment-2) 100%)",position:"relative" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div className="mono" style={{ fontSize:10,letterSpacing:".22em",color:"var(--mute)",marginBottom:52,display:"flex",gap:12,alignItems:"center" }}>
+          <a href="index.html" style={{ color:"var(--mute)",textDecoration:"none" }}>← CHEESE ACADEMY</a>
+          <span>/</span>
+          <span style={{ color:"var(--bordeaux)" }}>PILLAR · I — EDTECH</span>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:80,alignItems:"center" }}>
+          <div>
+            <div className="mono" style={{ fontSize:11,letterSpacing:".36em",color:"var(--bordeaux)",marginBottom:24,display:"flex",gap:14,alignItems:"center" }}>
+              <span style={{ display:"inline-block",width:8,height:8,border:"1px solid var(--bordeaux)",transform:"rotate(45deg)" }} />
+              <span>学ぶ。</span>
+            </div>
+            <h1 className="serif-jp" style={{ margin:0,fontSize:"clamp(52px,6vw,96px)",lineHeight:1.1,fontWeight:400,letterSpacing:".01em",color:"var(--ink)" }}>
+              チーズを、<br />
+              <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)",fontWeight:500 }}>科学する。</span>
+            </h1>
+            <p style={{ marginTop:36,fontSize:17,lineHeight:1.9,color:"var(--ink-2)",maxWidth:520 }}>
+              AIテイスティング診断、47テロワール・マップ、認定バッジ制度。<br />消費者を「目利き」へと育てる、体系的デジタル学習プラットフォーム。
+            </p>
+            <div style={{ marginTop:40,display:"flex",gap:16 }}>
+              <button style={{ ...btnFilled,padding:"16px 28px",fontSize:13 }}>無料で学習を始める →</button>
+              <button style={{ ...btnGhost,padding:"15px 26px",fontSize:13 }}>カリキュラムを見る</button>
+            </div>
+          </div>
+          <div>
+            <div style={{ position:"relative",height:280,overflow:"hidden",background:"var(--ink)" }}>
+              <img src="assets/Gemini_Generated_Image_hug06hhug06hhug0.png" alt="Cheese Academy Tokyo — Art, Science, Tradition" style={{ width:"100%",height:"110%",objectFit:"contain",display:"block",filter:"sepia(0.32) saturate(0.55) brightness(0.86) contrast(1.08)" }} />
+              <div style={{ position:"absolute",inset:0,background:"rgba(74,4,4,.12)",mixBlendMode:"multiply",pointerEvents:"none" }} />
+              <div style={{ position:"absolute",bottom:16,left:16,background:"var(--parchment)",padding:"6px 12px",border:"1px solid var(--bordeaux)" }}>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--bordeaux)" }}>SCENE.N°002 · CURRICULUM</div>
+              </div>
+            </div>
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:0,borderTop:"1px solid var(--ink)",borderLeft:"1px solid var(--ink)" }}>
+              {[["47","テロワール地域"],["6","コースモジュール"],["15","テイスティング軸"],["AI","搭載診断エンジン"]].map(([n,l],i) =>
+                <div key={i} style={{ padding:"28px 28px",borderRight:"1px solid var(--ink)",borderBottom:"1px solid var(--ink)" }}>
+                  <div className="serif" style={{ fontSize:48,color:"var(--bordeaux)",fontWeight:500,fontStyle:"italic",lineHeight:1 }}>{n}</div>
+                  <div style={{ fontSize:11,letterSpacing:".14em",color:"var(--mute)",marginTop:8 }}>{l}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ModuleCard({ m, i }) {
+  const [hover, setHover] = useState(false);
+  const borderRight = (i + 1) % 3 !== 0 ? "1px solid var(--rule)" : "none";
+  return (
+    <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{ padding:"44px 38px",borderRight,borderBottom:"1px solid var(--rule)",background:hover?"var(--cream-soft)":"transparent",transition:"background .35s ease",cursor:"default" }}>
+      <div className="mono" style={{ fontSize:10,letterSpacing:".26em",color:"var(--bordeaux)" }}>{m.cat}</div>
+      <div className="serif" style={{ fontSize:80,lineHeight:1,color:hover?"var(--bordeaux)":"var(--rule-soft)",fontWeight:500,fontStyle:"italic",transition:"color .35s",marginTop:12 }}>{m.n}</div>
+      <h3 className="serif-jp" style={{ margin:"18px 0 8px",fontSize:22,fontWeight:500,color:"var(--ink)" }}>{m.title}</h3>
+      <div style={{ fontSize:12,color:"var(--bordeaux)",marginBottom:16,letterSpacing:".06em" }}>{m.jp}</div>
+      <p style={{ margin:0,fontSize:13.5,lineHeight:1.85,color:"var(--ink-2)" }}>{m.desc}</p>
+      <div style={{ marginTop:28,display:"flex",gap:28,borderTop:"1px solid var(--rule-soft)",paddingTop:18 }}>
+        <div>
+          <div className="mono" style={{ fontSize:9,color:"var(--mute)",letterSpacing:".2em" }}>LESSONS</div>
+          <div style={{ fontSize:22,color:"var(--ink)",marginTop:4,fontWeight:500 }}>{m.lessons}</div>
+        </div>
+        <div style={{ borderLeft:"1px solid var(--rule-soft)",paddingLeft:24 }}>
+          <div className="mono" style={{ fontSize:9,color:"var(--mute)",letterSpacing:".2em" }}>DURATION</div>
+          <div style={{ fontSize:14,color:"var(--ink-2)",marginTop:6 }}>{m.time}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Curriculum() {
+  const modules = [
+    { n:"01",cat:"FOUNDATION",title:"チーズ基礎学",jp:"テロワール・製法・熟成の入門",desc:"ミルクから始まる科学。凝固・熟成・菌の働きを、データと実例で体系的に学ぶ入門モジュール。",lessons:8,time:"約4時間" },
+    { n:"02",cat:"SCIENCE",title:"発酵と微生物学",jp:"乳酸菌・カビが創る複雑味",desc:"ブルーチーズのロックフォルティン、白カビのペニシリウム。微生物が生み出すフレーバー化学を解説。",lessons:10,time:"約5時間" },
+    { n:"03",cat:"TERROIR",title:"産地と風土",jp:"47都道府県テロワール・マップ",desc:"北海道の酪農地帯から九州の高原まで。気候・土壌・飼育環境が味に与える影響を地図で学ぶ。",lessons:12,time:"約6時間" },
+    { n:"04",cat:"PAIRING",title:"ペアリング論",jp:"ビール・日本酒・ワインとの協奏",desc:"クラフトビールのホップ苦味とウォッシュ系の相性、日本酒の旨味とフレッシュチーズの親和性。科学的ペアリングを習得。",lessons:9,time:"約4.5時間" },
+    { n:"05",cat:"MARKET",title:"流通と市場",jp:"消費者行動と購買心理",desc:"二極化する食市場でスペシャルティが伸びる理由。データが示す消費者心理と流通の変化を読む。",lessons:7,time:"約3.5時間" },
+    { n:"06",cat:"ADVANCED",title:"テイスティング実践",jp:"AIと磨く感覚評価",desc:"15軸の感覚マッピングで自分の味覚を数値化。AI推薦と照合しながら精度を高める実践トレーニング。",lessons:15,time:"約7時間" },
+  ];
+  return (
+    <section id="curriculum" style={{ padding:"140px 48px 120px",background:"var(--parchment)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:80,alignItems:"end" }}>
+          <SectionMark n="01" label="Curriculum" />
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400 }}>
+            6つのモジュールで、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)" }}>目利き</span>になる。
+          </h2>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(3, 1fr)",gap:0,borderTop:"1px solid var(--ink)" }}>
+          {modules.map((m,i) => <ModuleCard key={i} m={m} i={i} />)}
+        </div>
+        <div style={{ marginTop:80,position:"relative",height:500,overflow:"hidden",background:"var(--ink)" }}>
+          <img src="assets/Gemini_Generated_Image_lv61ohlv61ohlv61.png" alt="Japanese Terroir & Artisanal Cheese Map" style={{ width:"100%",height:"100%",objectFit:"contain",display:"block",filter:"sepia(0.32) saturate(0.55) brightness(0.86) contrast(1.08)" }} />
+          <div style={{ position:"absolute",inset:0,background:"rgba(74,4,4,.12)",mixBlendMode:"multiply",pointerEvents:"none" }} />
+          <div style={{ position:"absolute",top:20,left:20,background:"var(--parchment)",padding:"6px 12px",border:"1px solid var(--bordeaux)" }}>
+            <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--bordeaux)" }}>SCENE.N°003 · 47 TERROIR MAP</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AITasting() {
+  const initial = [
+    { label:"塩味",value:72 },{ label:"酸味",value:48 },{ label:"苦味",value:31 },{ label:"旨味",value:85 },
+    { label:"甘味",value:22 },{ label:"コク",value:91 },{ label:"香り",value:67 },{ label:"テクスチャ",value:58 },
+  ];
+  const [axes, setAxes] = useState(initial);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setAxes(a => a.map(x => ({ ...x, value: Math.max(15, Math.min(97, x.value + (Math.random() * 10 - 5))) })));
+    }, 2000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <section style={{ padding:"140px 48px 120px",background:"var(--parchment-2)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:80,alignItems:"end" }}>
+          <SectionMark n="02" label="AI Tasting" />
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400 }}>
+            あなたの味覚を、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)" }}>15軸で</span>地図にする。
+          </h2>
+        </div>
+        <div style={{ marginBottom:60,position:"relative",height:460,overflow:"hidden",background:"var(--ink)" }}>
+          <img src="assets/Gemini_Generated_Image_lvwi8mlvwi8mlvwi.png" alt="AI Tasting Profile — Kobayashi Makoto" style={{ width:"100%",height:"116%",objectFit:"contain",display:"block",filter:"sepia(0.32) saturate(0.55) brightness(0.86) contrast(1.08)" }} />
+          <div style={{ position:"absolute",inset:0,background:"rgba(74,4,4,.12)",mixBlendMode:"multiply",pointerEvents:"none" }} />
+          <div style={{ position:"absolute",bottom:20,left:20,background:"var(--parchment)",padding:"6px 12px",border:"1px solid var(--bordeaux)" }}>
+            <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--bordeaux)" }}>SCENE.N°004 · AI TASTING LAB</div>
+          </div>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:60 }}>
+          <div style={{ background:"var(--ink)",padding:"36px 40px",color:"var(--parchment)" }}>
+            <div style={{ display:"flex",justifyContent:"space-between",marginBottom:28,paddingBottom:18,borderBottom:"1px solid rgba(253,253,245,.15)",alignItems:"center" }}>
+              <div>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--amber)" }}>TASTING · AI · LIVE</div>
+                <div style={{ marginTop:8,fontSize:13,color:"var(--cream)" }}>味覚マッピング · リアルタイム更新</div>
+              </div>
+              <span style={{ width:8,height:8,borderRadius:"50%",background:"var(--amber)",boxShadow:"0 0 12px var(--amber)",display:"block" }} />
+            </div>
+            {axes.map((ax,i) =>
+              <div key={i} style={{ marginBottom:18 }}>
+                <div style={{ display:"flex",justifyContent:"space-between",marginBottom:7 }}>
+                  <span style={{ fontSize:12,color:"rgba(253,253,245,.8)" }}>{ax.label}</span>
+                  <span className="mono" style={{ fontSize:11,color:"var(--amber)" }}>{Math.round(ax.value)}</span>
+                </div>
+                <div style={{ height:4,background:"rgba(253,253,245,.1)" }}>
+                  <div style={{ height:"100%",width:ax.value+"%",background:"var(--amber)",transition:"width 1.5s cubic-bezier(.3,.7,.2,1)" }} />
+                </div>
+              </div>
+            )}
+            <div style={{ marginTop:24,paddingTop:18,borderTop:"1px solid rgba(253,253,245,.1)" }}>
+              <div className="mono" style={{ fontSize:9,letterSpacing:".2em",color:"rgba(253,253,245,.4)" }}>PROFILE · USER · #0042 · KOBAYASHI MAKOTO</div>
+            </div>
+          </div>
+          <div style={{ display:"flex",flexDirection:"column",justifyContent:"center",gap:36 }}>
+            {[
+              ["01 · 診断","50問のテイスティングクイズで、あなたの味覚プロファイルを構築します。好きな食感・香り・後味を通じてデータが蓄積されます。"],
+              ["02 · マッピング","15軸のフレーバーマップで視覚化。得意・不得意が一目でわかるレーダーチャートで自己認識が深まります。"],
+              ["03 · 推薦","プロファイルに合ったチーズ・ペアリング・産地を自動推薦。精度はSNSアルゴリズムを超えると私たちは考えます。"],
+              ["04 · 成長","定期的な再診断で変化を追跡。学習の進捗を数値で確認し、弱点を的確に補強します。"],
+            ].map(([title,body],i) =>
+              <div key={i} style={{ display:"flex",gap:24 }}>
+                <div className="mono" style={{ fontSize:10,color:"var(--bordeaux)",minWidth:28,marginTop:2,letterSpacing:".14em" }}>{title.split(" · ")[0]}</div>
+                <div style={{ flex:1,paddingBottom:28,borderBottom:"1px dashed var(--rule)" }}>
+                  <div style={{ fontSize:16,fontWeight:500,color:"var(--ink)",marginBottom:10 }}>{title.split(" · ")[1]}</div>
+                  <p style={{ margin:0,fontSize:14,lineHeight:1.85,color:"var(--ink-2)" }}>{body}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Certification() {
+  const levels = [
+    { k:"I",name:"EXPLORER",jp:"探索者",desc:"3コースを修了したすべての学習者へ。基礎知識と好奇心を証明するエントリーバッジ。",req:"3コース修了",color:"var(--amber)" },
+    { k:"II",name:"CONNOISSEUR",jp:"目利き",desc:"全コースを修了し、AIテイスティング診断で70点以上を獲得した上級者に贈られます。",req:"全コース修了 + テイスティング 70点以上",color:"var(--bordeaux)" },
+    { k:"III",name:"SOMMELIER",jp:"ソムリエ",desc:"最上位バッジ。生産者訪問・外部審査を経た、日本の食文化の専門家にのみ授与されます。",req:"審査合格 + 生産地訪問",color:"var(--ink)" },
+  ];
+  return (
+    <section style={{ padding:"140px 48px 120px",background:"var(--bordeaux)",color:"var(--parchment)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:80,alignItems:"end" }}>
+          <div className="mono" style={{ fontSize:11,letterSpacing:".24em",color:"rgba(253,253,245,.6)",display:"flex",alignItems:"center",gap:14 }}>
+            <span style={{ fontWeight:500 }}>§03</span>
+            <span style={{ width:28,height:1,background:"rgba(253,253,245,.3)" }} />
+            <span>Certification</span>
+          </div>
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400,color:"var(--parchment)" }}>
+            知識は、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--cream)" }}>バッジになる。</span>
+          </h2>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(3, 1fr)",gap:0,borderTop:"1px solid rgba(253,253,245,.2)" }}>
+          {levels.map((lv,i) =>
+            <div key={i} style={{ padding:"52px 44px",borderRight:i<2?"1px solid rgba(253,253,245,.2)":"none" }}>
+              <div style={{ width:64,height:64,border:"1px solid "+lv.color,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:28 }}>
+                <div className="serif" style={{ fontSize:28,fontStyle:"italic",color:lv.color }}>{lv.k}</div>
+              </div>
+              <div className="mono" style={{ fontSize:10,letterSpacing:".3em",color:"var(--cream)",marginBottom:8 }}>{lv.name}</div>
+              <h3 className="serif-jp" style={{ margin:"8px 0 20px",fontSize:28,fontWeight:400,color:"var(--parchment)" }}>{lv.jp}</h3>
+              <p style={{ margin:0,fontSize:14,lineHeight:1.85,color:"rgba(253,253,245,.75)" }}>{lv.desc}</p>
+              <div style={{ marginTop:28,paddingTop:20,borderTop:"1px solid rgba(253,253,245,.15)" }}>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".2em",color:"rgba(253,253,245,.5)",marginBottom:6 }}>REQUIREMENT</div>
+                <div style={{ fontSize:13,color:"var(--cream)" }}>{lv.req}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Pricing() {
+  const [annual, setAnnual] = useState(false);
+  const plans = [
+    { name:"FREE",jp:"無料",price:"¥0",period:"/ forever",desc:"はじめて学ぶ方へ。コアコンテンツを無料で体験できます。",features:["基礎モジュール × 2コース","テロワール・マップ閲覧","コミュニティフォーラム","月1回 AI診断"],cta:"無料で始める",highlight:false },
+    { name:"PREMIUM",jp:"プレミアム",price:annual?"¥8,800":"¥980",period:annual?"/年":"/月",desc:"本格的に学びたい方へ。全コースとAI診断が解放されます。",features:["全6コース・アンリミテッド","AI診断・回数無制限","テイスティングログ記録","EXPLORER バッジ取得","新着コンテンツ優先アクセス"],cta:"プレミアムを始める",highlight:true },
+    { name:"PRO",jp:"プロフェッショナル",price:annual?"¥24,000":"¥2,480",period:annual?"/年":"/月",desc:"業界人・研究者・生産者向け。すべての機能と特典を利用できます。",features:["PREMIUM の全機能","全バッジ取得対象","オフラインイベント招待","生産者直販チャンネル","専任サポート"],cta:"プロを始める",highlight:false },
+  ];
+  return (
+    <section style={{ padding:"140px 48px 120px",background:"var(--parchment)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:60,alignItems:"end" }}>
+          <SectionMark n="04" label="Pricing" />
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400 }}>
+            はじめは、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)" }}>無料から。</span>
+          </h2>
+        </div>
+        <div style={{ display:"flex",gap:16,alignItems:"center",marginBottom:48,justifyContent:"flex-end" }}>
+          <span className="mono" style={{ fontSize:11,color:annual?"var(--mute)":"var(--bordeaux)" }}>月払い</span>
+          <div onClick={() => setAnnual(!annual)} style={{ width:44,height:24,background:annual?"var(--bordeaux)":"var(--rule)",borderRadius:12,cursor:"pointer",position:"relative",transition:"background .3s" }}>
+            <div style={{ position:"absolute",top:3,left:annual?22:3,width:18,height:18,borderRadius:"50%",background:"white",transition:"left .3s" }} />
+          </div>
+          <span className="mono" style={{ fontSize:11,color:annual?"var(--bordeaux)":"var(--mute)" }}>年払い <span style={{ color:"var(--amber-2)" }}>（25%OFF）</span></span>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(3, 1fr)",gap:0,borderTop:"1px solid var(--ink)" }}>
+          {plans.map((plan,i) =>
+            <div key={i} style={{ padding:"52px 44px",borderRight:i<2?"1px solid var(--rule)":"none",background:plan.highlight?"var(--bordeaux)":"transparent",color:plan.highlight?"var(--parchment)":"var(--ink)",position:"relative" }}>
+              {plan.highlight && <div className="mono" style={{ position:"absolute",top:24,right:24,fontSize:9,letterSpacing:".22em",color:"var(--amber)",border:"1px solid var(--amber)",padding:"4px 10px" }}>POPULAR</div>}
+              <div className="mono" style={{ fontSize:10,letterSpacing:".3em",color:plan.highlight?"var(--cream)":"var(--bordeaux)" }}>{plan.name}</div>
+              <div style={{ fontSize:12,color:plan.highlight?"rgba(253,253,245,.6)":"var(--mute)",marginTop:4 }}>{plan.jp}</div>
+              <div style={{ marginTop:28 }}>
+                <span className="serif" style={{ fontSize:52,fontStyle:"italic",fontWeight:500,color:plan.highlight?"var(--cream)":"var(--bordeaux)" }}>{plan.price}</span>
+                <span style={{ fontSize:13,color:plan.highlight?"rgba(253,253,245,.6)":"var(--mute)",marginLeft:6 }}>{plan.period}</span>
+              </div>
+              <p style={{ margin:"18px 0 0",fontSize:13.5,lineHeight:1.8,color:plan.highlight?"rgba(253,253,245,.8)":"var(--ink-2)" }}>{plan.desc}</p>
+              <div style={{ width:48,height:1,background:plan.highlight?"rgba(253,253,245,.3)":"var(--rule)",margin:"28px 0" }} />
+              <ul style={{ listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:12 }}>
+                {plan.features.map((f,j) =>
+                  <li key={j} style={{ display:"flex",gap:12,fontSize:13.5,color:plan.highlight?"rgba(253,253,245,.85)":"var(--ink-2)",alignItems:"baseline" }}>
+                    <span className="mono" style={{ fontSize:9,color:plan.highlight?"var(--amber)":"var(--bordeaux)",letterSpacing:".18em",minWidth:16 }}>—</span>
+                    <span>{f}</span>
+                  </li>
+                )}
+              </ul>
+              <div style={{ marginTop:36 }}>
+                <button style={plan.highlight
+                  ? { ...btnFilled,background:"var(--amber)",color:"var(--ink)",padding:"15px 24px",width:"100%",fontSize:13 }
+                  : { ...btnGhost,padding:"14px 24px",width:"100%",fontSize:13,borderColor:plan.highlight?"var(--parchment)":"var(--ink)",color:plan.highlight?"var(--parchment)":"var(--ink)" }}>
+                  {plan.cta}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PageCTA() {
+  return (
+    <section style={{ padding:"160px 48px",background:"var(--cream)",position:"relative",overflow:"hidden" }}>
+      <div style={{ position:"absolute",top:-40,right:-40,opacity:.08 }}>
+        <svg width="480" height="480" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="var(--bordeaux)" strokeWidth=".6" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bordeaux)" strokeWidth=".4" />
+          <text x="50" y="46" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="18" fill="var(--bordeaux)" fontStyle="italic">CA</text>
+        </svg>
+      </div>
+      <div style={{ maxWidth:960,margin:"0 auto",textAlign:"center",position:"relative" }}>
+        <div className="mono" style={{ fontSize:11,letterSpacing:".28em",color:"var(--bordeaux)",marginBottom:32 }}>ACADEMY · TOKYO · 2026</div>
+        <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(48px,5.5vw,88px)",lineHeight:1.1,fontWeight:400 }}>
+          味覚は、<br />
+          <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)",fontWeight:500 }}>鍛えられる。</span>
+        </h2>
+        <p style={{ marginTop:36,fontSize:17,lineHeight:2,color:"var(--ink-2)",maxWidth:580,margin:"36px auto 0" }}>
+          今日から学びを始めてください。AIがあなたの味覚を地図にし、47の産地があなたを待っています。
+        </p>
+        <div style={{ marginTop:52,display:"flex",gap:16,justifyContent:"center" }}>
+          <button style={{ ...btnFilled,padding:"18px 32px",fontSize:14 }}>無料で学習を始める →</button>
+          <button style={{ ...btnGhost,padding:"17px 30px",fontSize:14 }}>カリキュラム詳細</button>
+        </div>
+        <div className="serif" style={{ fontStyle:"italic",fontSize:14,color:"var(--bordeaux)",marginTop:36 }}>— Cheese Academy Tokyo</div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer style={{ background:"var(--ink)",color:"var(--parchment)",padding:"80px 48px 36px" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr",gap:40,paddingBottom:60,borderBottom:"1px solid rgba(253,253,245,.18)" }}>
+          <div>
+            <Logo dark />
+            <p style={{ marginTop:20,fontSize:13,lineHeight:1.9,color:"rgba(253,253,245,.6)",maxWidth:360,whiteSpace:"pre-line" }}>
+              日本のテロワールを、学習と経営のプラットフォームに。{"\n"}2026年、Tokyo より始動。
+            </p>
+          </div>
+          {[
+            ["PRODUCT",[["Academy","academy.html"],["Terroir Matching","terroir-matching.html"],["AI Mentor","ai-mentor.html"],["Pricing","#pricing"]]],
+            ["COMPANY",[["About","#"],["Team","#"],["Press","#"],["Careers","#"]]],
+            ["RESOURCES",[["Journal","#"],["Research","#"],["Partners","#"],["Guide","#"]]],
+            ["CONTACT",[["hello@cheese.ac","#"],["Privacy","#"],["Terms","#"],["Sitemap","#"]]],
+          ].map(([h,items],i) =>
+            <div key={i}>
+              <div className="mono" style={{ fontSize:10,letterSpacing:".26em",color:"var(--cream)" }}>{h}</div>
+              <ul style={{ listStyle:"none",padding:0,margin:"16px 0 0",display:"flex",flexDirection:"column",gap:10 }}>
+                {items.map(([label,href],j) =>
+                  <li key={j}><a href={href} style={{ color:"rgba(253,253,245,.75)",fontSize:13,textDecoration:"none" }}>{label}</a></li>
+                )}
+              </ul>
+            </div>
+          )}
+        </div>
+        <div style={{ paddingTop:32,display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+          <div className="mono" style={{ fontSize:10,letterSpacing:".2em",color:"rgba(253,253,245,.4)" }}>© 2026 CHEESE ACADEMY TOKYO · ALL RIGHTS RESERVED</div>
+          <div className="serif" style={{ fontStyle:"italic",fontSize:14,color:"var(--cream)" }}>terroir · science · craft</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <Nav />
+      <Hero />
+      <Curriculum />
+      <AITasting />
+      <Certification />
+      <Pricing />
+      <PageCTA />
+      <Footer />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

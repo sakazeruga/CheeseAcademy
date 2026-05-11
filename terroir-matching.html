@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Terroir Matching — 需要データが、出会いを設計する。| Cheese Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=JetBrains+Mono&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#FDFDF5;--parchment-2:#F6F1E3;--cream:#F3E5AB;--cream-soft:#EFE5C8;
+    --bordeaux:#4A0404;--bordeaux-2:#6B0F0F;--amber:#D4A017;--amber-2:#B58410;
+    --ink:#1A1410;--ink-2:#3A3028;--mute:#8A7E6C;--rule:#C9BFA6;--rule-soft:#E6DFCA;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--parchment);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt";}
+  .serif{font-family:"Cormorant Garamond",serif;font-weight:400;letter-spacing:.01em}
+  .serif-jp{font-family:"Noto Serif JP",serif;font-weight:400}
+  .mono{font-family:"JetBrains Mono",monospace;letter-spacing:.04em}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.35;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55 0 0 0 0 .5 0 0 0 0 .4 0 0 0 .06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+</style>
+<script src="js/react.development.js"></script>
+<script src="js/react-dom.development.js"></script>
+<script src="js/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const btnFilled = { background:"var(--bordeaux)",color:"var(--parchment)",border:"none",padding:"11px 20px",fontSize:12,letterSpacing:".12em",cursor:"pointer",fontFamily:"'Noto Sans JP',sans-serif",fontWeight:500 };
+const btnGhost  = { background:"transparent",color:"var(--ink)",border:"1px solid var(--ink)",padding:"10px 18px",fontSize:12,letterSpacing:".12em",cursor:"pointer",fontFamily:"'Noto Sans JP',sans-serif",fontWeight:500 };
+
+const SectionMark = ({ n, label }) =>
+  <div className="mono" style={{ fontSize:11,letterSpacing:".24em",textTransform:"uppercase",color:"var(--bordeaux)",display:"flex",alignItems:"center",gap:14 }}>
+    <span style={{ fontWeight:500 }}>§{n}</span>
+    <span style={{ width:28,height:1,background:"var(--bordeaux)",opacity:.5 }} />
+    <span style={{ color:"var(--ink-2)" }}>{label}</span>
+  </div>;
+
+function Logo({ dark = false }) {
+  return (
+    <a href="index.html" style={{ textDecoration:"none",display:"flex",alignItems:"center",gap:12 }}>
+      <div style={{ width:40,height:40,border:"1px solid "+(dark?"rgba(253,253,245,.5)":"var(--ink)"),display:"grid",placeItems:"center",fontFamily:"Cormorant Garamond, serif",fontSize:26,fontWeight:500,color:dark?"var(--parchment)":"var(--ink)" }}>C</div>
+      <div style={{ lineHeight:1.1 }}>
+        <div className="serif" style={{ fontSize:18,letterSpacing:".02em",color:dark?"var(--parchment)":"var(--ink)" }}>Cheese Academy</div>
+        <div className="mono" style={{ fontSize:9,letterSpacing:".28em",color:dark?"rgba(253,253,245,.6)":"var(--mute)" }}>TOKYO · TERROIR · TECH</div>
+      </div>
+    </a>
+  );
+}
+
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", on); on();
+    return () => window.removeEventListener("scroll", on);
+  }, []);
+  const links = [["§01","Market","index.html#s01"],["§02","Pillars","index.html#s02"],["§03","For You","index.html#s03"],["§04","AI Mentor","index.html#s04"],["§05","Journal","index.html#s05"]];
+  return (
+    <div style={{ position:"fixed",top:0,left:0,right:0,zIndex:50,transition:"all .35s ease",background:scrolled?"rgba(253,253,245,.92)":"transparent",backdropFilter:scrolled?"blur(10px)":"none",borderBottom:scrolled?"1px solid var(--rule-soft)":"1px solid transparent" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto",padding:"18px 48px",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+        <Logo />
+        <nav style={{ display:"flex",gap:36,alignItems:"center" }}>
+          {links.map(([k,l,href]) =>
+            <a key={l} href={href} style={{ textDecoration:"none",color:"var(--ink-2)",fontSize:13,display:"flex",gap:8,alignItems:"baseline" }}>
+              <span className="mono" style={{ fontSize:10,color:"var(--bordeaux)",opacity:.7 }}>{k}</span>
+              <span>{l}</span>
+            </a>
+          )}
+        </nav>
+        <div style={{ display:"flex",gap:10 }}>
+          <button style={btnGhost}>ログイン</button>
+          <button style={btnFilled}>生産者として登録 →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Hero() {
+  return (
+    <section style={{ minHeight:"80vh",padding:"160px 48px 120px",background:"linear-gradient(180deg,var(--parchment) 0%,var(--parchment-2) 100%)",position:"relative",overflow:"hidden" }}>
+      {/* Background deco */}
+      <div aria-hidden style={{ position:"absolute",right:"-4%",top:"15%",width:"52%",height:"60%",background:"radial-gradient(ellipse at center,rgba(243,229,171,.5),rgba(243,229,171,0) 65%)",pointerEvents:"none" }} />
+      <div style={{ maxWidth:1440,margin:"0 auto",position:"relative" }}>
+        <div className="mono" style={{ fontSize:10,letterSpacing:".22em",color:"var(--mute)",marginBottom:52,display:"flex",gap:12,alignItems:"center" }}>
+          <a href="index.html" style={{ color:"var(--mute)",textDecoration:"none" }}>← CHEESE ACADEMY</a>
+          <span>/</span>
+          <span style={{ color:"var(--bordeaux)" }}>PILLAR · II — MARKETPLACE</span>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:80,alignItems:"center" }}>
+          <div>
+            <div className="mono" style={{ fontSize:11,letterSpacing:".36em",color:"var(--bordeaux)",marginBottom:24,display:"flex",gap:14,alignItems:"center" }}>
+              <span style={{ display:"inline-block",width:8,height:8,border:"1px solid var(--bordeaux)",transform:"rotate(45deg)" }} />
+              <span>繋ぐ。</span>
+            </div>
+            <h1 className="serif-jp" style={{ margin:0,fontSize:"clamp(48px,5.5vw,88px)",lineHeight:1.1,fontWeight:400,letterSpacing:".01em",color:"var(--ink)" }}>
+              需要データが、<br />
+              <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)",fontWeight:500 }}>出会いを</span><br />
+              設計する。
+            </h1>
+            <p style={{ marginTop:36,fontSize:17,lineHeight:1.9,color:"var(--ink-2)",maxWidth:520 }}>
+              成長著しい地方型ブルワリー（CAGR 12.6%）とチーズ職人の最適ペアリングを、需要データから創出するマーケットプレイス。
+            </p>
+            <div style={{ marginTop:40,display:"flex",gap:16 }}>
+              <button style={{ ...btnFilled,padding:"16px 28px",fontSize:13 }}>生産者として登録 →</button>
+              <button style={{ ...btnGhost,padding:"15px 26px",fontSize:13 }}>仕組みを見る</button>
+            </div>
+          </div>
+          <div>
+            <div style={{ position:"relative",height:280,overflow:"hidden" }}>
+              <img src="assets/Gemini_Generated_Image_am4rj2am4rj2am4r.png" alt="Artisan and Brewer — Terroir Matching" style={{ width:"100%",height:"100%",objectFit:"cover",objectPosition:"center",display:"block",filter:"sepia(0.28) saturate(0.62) brightness(0.88) contrast(1.06)" }} />
+              <div style={{ position:"absolute",inset:0,background:"rgba(74,4,4,.18)",mixBlendMode:"multiply",pointerEvents:"none" }} />
+              <div style={{ position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 55%,rgba(26,20,16,.45))",pointerEvents:"none" }} />
+              <div style={{ position:"absolute",bottom:16,left:16,background:"var(--parchment)",padding:"6px 12px",border:"1px solid var(--bordeaux)" }}>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--bordeaux)" }}>SCENE.N°001 · ARTISAN × BREWER</div>
+              </div>
+            </div>
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:0,borderTop:"1px solid var(--ink)",borderLeft:"1px solid var(--ink)" }}>
+              {[["120+","参加ブルワリー"],["48","チーズ生産者"],["94%","マッチング精度"],["12.6%","市場成長率 CAGR"]].map(([n,l],i) =>
+                <div key={i} style={{ padding:"28px 28px",borderRight:"1px solid var(--ink)",borderBottom:"1px solid var(--ink)" }}>
+                  <div className="serif" style={{ fontSize:46,color:"var(--bordeaux)",fontWeight:500,fontStyle:"italic",lineHeight:1 }}>{n}</div>
+                  <div style={{ fontSize:11,letterSpacing:".14em",color:"var(--mute)",marginTop:8 }}>{l}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    { n:"01",title:"プロフィール登録",body:"生産物の種類・フレーバープロファイル・生産量・出荷可能エリアを入力します。初回登録は15分以内で完了します。",tag:"SETUP" },
+    { n:"02",title:"アルゴリズム分析",body:"需要データ × フレーバーマトリクス × 地域流通コストの3軸で最適なペアリング候補を自動算出します。",tag:"ANALYSIS" },
+    { n:"03",title:"マッチング提案",body:"条件に合った相手先を3〜5件提示。お互いのプロフィールを確認した上で、関心があれば接触申請へ進みます。",tag:"MATCHING" },
+    { n:"04",title:"交渉・契約",body:"メッセージ・ビデオ通話・契約書ひな形まで、プラットフォーム内で完結。外部ツールへの移動は不要です。",tag:"CONTRACT" },
+  ];
+  return (
+    <section style={{ padding:"140px 48px 120px",background:"var(--parchment)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:80,alignItems:"end" }}>
+          <SectionMark n="01" label="How It Works" />
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400 }}>
+            4ステップで、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)" }}>取引が始まる。</span>
+          </h2>
+        </div>
+        <div style={{ display:"flex",flexDirection:"column",gap:0,borderTop:"1px solid var(--ink)" }}>
+          {steps.map((s,i) => {
+            const [hover, setHover] = useState(false);
+            return (
+              <div key={i} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+                style={{ display:"grid",gridTemplateColumns:"120px 1fr 1fr",gap:0,padding:"52px 0",borderBottom:"1px solid var(--rule)",background:hover?"var(--cream-soft)":"transparent",transition:"background .35s",padding:"52px 40px",cursor:"default" }}>
+                <div>
+                  <div className="serif" style={{ fontSize:80,lineHeight:1,color:hover?"var(--bordeaux)":"var(--rule-soft)",fontStyle:"italic",fontWeight:500,transition:"color .35s" }}>{s.n}</div>
+                  <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--bordeaux)",marginTop:8 }}>{s.tag}</div>
+                </div>
+                <h3 className="serif-jp" style={{ margin:0,fontSize:28,fontWeight:500,color:"var(--ink)",alignSelf:"center",paddingLeft:40 }}>{s.title}</h3>
+                <p style={{ margin:0,fontSize:15,lineHeight:1.9,color:"var(--ink-2)",alignSelf:"center",paddingLeft:40,borderLeft:"1px solid var(--rule-soft)" }}>{s.body}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TwoSides() {
+  const [active, setActive] = useState(0);
+  const sides = [
+    {
+      k:"CHEESE · ARTISAN",
+      title:"チーズ職人へ",
+      jp:"技術を、需要に変える。",
+      benefits:[
+        ["需要予測","3ヶ月先の地域需要をリアルタイムで可視化。生産計画の精度が上がります。"],
+        ["販路開拓","既存ルートの外にいる新規ブルワリーへの接続機会を自動で生成します。"],
+        ["共同ブランディング","Cheese Academy 認定ラベルで、都市の目利き消費者へ直接訴求できます。"],
+        ["ストーリー流通","職人の背景・土地の記憶ごとパッケージ化し、消費者体験に組み込みます。"],
+      ],
+      img:"assets/artisan-hands.jpg",
+      cta:"職人として登録",
+    },
+    {
+      k:"MICRO · BREWERY",
+      title:"マイクロブルワリーへ",
+      jp:"ペアリングが、ブランドになる。",
+      benefits:[
+        ["希少ロット調達","市場に出回らない地域限定チーズへの優先アクセス権を取得できます。"],
+        ["テロワール訴求","産地の物語をビールのラベルとコースに組み込み、差別化を図ります。"],
+        ["消費者教育","Academy 連携コンテンツを活用し、顧客のリテラシーを育てます。"],
+        ["イベント連携","Academy 修了生向けのペアリングイベントを共同開催できます。"],
+      ],
+      img:"assets/brewery-consulting.jpg",
+      cta:"ブルワリーとして登録",
+    },
+  ];
+  const s = sides[active];
+  return (
+    <section style={{ padding:"140px 0 120px",background:"var(--parchment-2)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto",padding:"0 48px" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:60,alignItems:"end" }}>
+          <SectionMark n="02" label="For You" />
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400 }}>
+            立場で、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)" }}>違う価値</span>が届く。
+          </h2>
+        </div>
+        <div style={{ display:"flex",gap:0,borderBottom:"1px solid var(--rule)",marginBottom:60 }}>
+          {sides.map((x,i) =>
+            <button key={i} onClick={() => setActive(i)}
+              style={{ background:"transparent",border:"none",cursor:"pointer",padding:"20px 36px 20px 0",marginRight:32,color:i===active?"var(--bordeaux)":"var(--mute)",fontSize:13,letterSpacing:".14em",position:"relative",fontFamily:"'JetBrains Mono',monospace",transition:"color .25s" }}>
+              <span className="mono">0{i+1} · {x.k}</span>
+              {i===active && <div style={{ position:"absolute",bottom:-1,left:0,right:32,height:2,background:"var(--bordeaux)" }} />}
+            </button>
+          )}
+        </div>
+        <div key={active} style={{ display:"grid",gridTemplateColumns:"5fr 7fr",gap:72,animation:"fadeUp .5s ease" }}>
+          <style>{"@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}"}</style>
+          <div>
+            <div style={{ height:480,backgroundImage:`url(${s.img})`,backgroundSize:"cover",backgroundPosition:"center",position:"relative" }}>
+              <div style={{ position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(26,20,16,.55))" }} />
+              <div style={{ position:"absolute",bottom:28,left:28,right:28 }}>
+                <div className="serif" style={{ fontSize:36,fontStyle:"italic",lineHeight:1.1,color:"var(--parchment)" }}>{s.title}</div>
+                <div className="serif-jp" style={{ fontSize:15,color:"var(--cream)",marginTop:10 }}>{s.jp}</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:0 }}>
+              {s.benefits.map(([title,body],i) =>
+                <div key={i} style={{ padding:"30px 28px",borderBottom:i<2?"1px solid var(--rule-soft)":"none",borderRight:i%2===0?"1px solid var(--rule-soft)":"none" }}>
+                  <div className="mono" style={{ fontSize:10,color:"var(--amber-2)",letterSpacing:".22em" }}>BENEFIT · 0{i+1}</div>
+                  <h4 className="serif-jp" style={{ margin:"14px 0 10px",fontSize:20,fontWeight:500,color:"var(--ink)" }}>{title}</h4>
+                  <p style={{ margin:0,fontSize:13.5,lineHeight:1.8,color:"var(--ink-2)" }}>{body}</p>
+                </div>
+              )}
+            </div>
+            <div style={{ marginTop:36,display:"flex",gap:14 }}>
+              <button style={{ ...btnFilled,padding:"15px 26px",fontSize:13 }}>{s.cta} →</button>
+              <button style={{ ...btnGhost,padding:"14px 26px",fontSize:13 }}>詳細資料を見る</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Algorithm() {
+  const [score, setScore] = useState(84);
+  const [bars, setBars] = useState([78, 62, 91, 55, 73]);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setScore(s => Math.max(60, Math.min(98, s + (Math.random() * 8 - 4))));
+      setBars(b => b.map(x => Math.max(30, Math.min(99, x + (Math.random() * 12 - 6)))));
+    }, 2200);
+    return () => clearInterval(id);
+  }, []);
+  const circ = 2 * Math.PI * 54;
+  return (
+    <section style={{ padding:"140px 48px 120px",background:"var(--bordeaux)",color:"var(--parchment)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:80,alignItems:"end" }}>
+          <div className="mono" style={{ fontSize:11,letterSpacing:".24em",color:"rgba(253,253,245,.6)",display:"flex",alignItems:"center",gap:14 }}>
+            <span>§03</span>
+            <span style={{ width:28,height:1,background:"rgba(253,253,245,.3)" }} />
+            <span>Algorithm</span>
+          </div>
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400,color:"var(--parchment)" }}>
+            データが、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--cream)" }}>相性を計算する。</span>
+          </h2>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:48 }}>
+          {/* Left: flavor matrix image + matching factors */}
+          <div style={{ display:"flex",flexDirection:"column",gap:28 }}>
+            <div style={{ position:"relative",height:360,overflow:"hidden",background:"var(--ink)" }}>
+              <img src="assets/Gemini_Generated_Image_7rdp9h7rdp9h7rdp.png" alt="Flavor Matrix Matching Algorithm" style={{ width:"100%",height:"100%",objectFit:"contain",display:"block",filter:"sepia(0.40)" }} />
+              <div style={{ position:"absolute",inset:0,background:"rgba(74,4,4,.22)",mixBlendMode:"multiply",pointerEvents:"none" }} />
+              <div style={{ position:"absolute",bottom:16,left:16,background:"rgba(74,4,4,.85)",padding:"6px 12px",border:"1px solid rgba(253,253,245,.3)" }}>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--cream)" }}>SCENE.N°002 · FLAVOR MATRIX</div>
+              </div>
+            </div>
+            {[
+              ["FLAVOR · MATRIX","フレーバーマトリクス","チーズの脂肪酸組成・タンパク質分解度・pH値とビールのホップ苦味・麦芽糖度・炭酸量を15次元で照合します。"],
+              ["DEMAND · SIGNAL","需要シグナル","ECサイト購買データ・SNS言及数・飲食店仕入れ動向から3ヶ月先の地域需要を予測します。"],
+              ["LOGISTICS · FIT","物流適合","温度管理要件・配送距離・ロットサイズの制約を自動チェックし、実現可能なペアリングのみを提案します。"],
+            ].map(([tag,title,body],i) =>
+              <div key={i} style={{ padding:"28px 32px",border:"1px solid rgba(253,253,245,.18)",background:"rgba(253,253,245,.04)" }}>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".24em",color:"var(--amber)",marginBottom:10 }}>{tag}</div>
+                <h4 className="serif-jp" style={{ margin:"0 0 12px",fontSize:20,fontWeight:500,color:"var(--parchment)" }}>{title}</h4>
+                <p style={{ margin:0,fontSize:13.5,lineHeight:1.8,color:"rgba(253,253,245,.75)" }}>{body}</p>
+              </div>
+            )}
+          </div>
+          {/* Right: live gauge */}
+          <div style={{ background:"rgba(253,253,245,.05)",border:"1px solid rgba(253,253,245,.15)",padding:"36px 40px" }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:32,paddingBottom:20,borderBottom:"1px solid rgba(253,253,245,.12)" }}>
+              <div>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--amber)" }}>MATCH · ENGINE · LIVE</div>
+                <div style={{ marginTop:8,fontSize:13,color:"rgba(253,253,245,.7)" }}>小林牧場 × 湘南クラフトブルワリー</div>
+              </div>
+              <span style={{ width:8,height:8,borderRadius:"50%",background:"var(--amber)",boxShadow:"0 0 12px var(--amber)",display:"block" }} />
+            </div>
+            <div style={{ display:"flex",alignItems:"center",gap:40 }}>
+              <div style={{ position:"relative",width:160,height:160,flexShrink:0 }}>
+                <svg viewBox="0 0 120 120" width="160" height="160">
+                  <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(253,253,245,.12)" strokeWidth="4" />
+                  <circle cx="60" cy="60" r="54" fill="none" stroke="var(--amber)" strokeWidth="4"
+                    strokeDasharray={circ} strokeDashoffset={circ*(1-score/100)}
+                    strokeLinecap="butt" transform="rotate(-90 60 60)"
+                    style={{ transition:"stroke-dashoffset 1.5s cubic-bezier(.3,.7,.2,1)" }} />
+                </svg>
+                <div style={{ position:"absolute",inset:0,display:"grid",placeItems:"center" }}>
+                  <div style={{ textAlign:"center" }}>
+                    <div className="serif" style={{ fontSize:44,color:"var(--amber)",lineHeight:1,fontStyle:"italic",fontWeight:500 }}>{Math.round(score)}<span style={{ fontSize:22 }}>%</span></div>
+                    <div className="mono" style={{ fontSize:9,letterSpacing:".2em",color:"rgba(253,253,245,.5)",marginTop:4 }}>MATCH</div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ flex:1,display:"flex",flexDirection:"column",gap:14 }}>
+                {["フレーバー適合","需要マッチ","物流効率","ブランド親和","市場タイミング"].map((label,i) =>
+                  <div key={i}>
+                    <div style={{ display:"flex",justifyContent:"space-between",marginBottom:5 }}>
+                      <span style={{ fontSize:11,color:"rgba(253,253,245,.7)" }}>{label}</span>
+                      <span className="mono" style={{ fontSize:10,color:"var(--amber)" }}>{Math.round(bars[i])}</span>
+                    </div>
+                    <div style={{ height:3,background:"rgba(253,253,245,.1)" }}>
+                      <div style={{ height:"100%",width:bars[i]+"%",background:"var(--amber)",transition:"width 1.5s cubic-bezier(.3,.7,.2,1)" }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ marginTop:28,paddingTop:20,borderTop:"1px solid rgba(253,253,245,.12)",display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:0 }}>
+              {[["提案候補","3件"],["予測粗利","+14.2%"],["初回ロット","200kg〜"]].map(([k,v],i) =>
+                <div key={i} style={{ paddingLeft:i===0?0:20,borderLeft:i===0?"none":"1px solid rgba(253,253,245,.15)" }}>
+                  <div className="mono" style={{ fontSize:9,color:"rgba(253,253,245,.5)",letterSpacing:".18em" }}>{k}</div>
+                  <div className="serif" style={{ fontSize:22,color:"var(--parchment)",marginTop:4,fontStyle:"italic" }}>{v}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function JoinFlow() {
+  return (
+    <section style={{ padding:"140px 48px 120px",background:"var(--parchment)" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 2fr",gap:80,marginBottom:80,alignItems:"end" }}>
+          <SectionMark n="04" label="Join Flow" />
+          <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(40px,4.2vw,64px)",lineHeight:1.25,fontWeight:400 }}>
+            登録から、<br />
+            <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)" }}>最初の提案まで</span><br />
+            最短3日。
+          </h2>
+        </div>
+        <div style={{ marginBottom:80,position:"relative",height:480,overflow:"hidden" }}>
+          <img src="assets/Gemini_Generated_Image_kq8xz7kq8xz7kq8x.png" alt="Pairing Analysis — Shinjuku Pale Ale × Hokkaido Blue" style={{ width:"100%",height:"100%",objectFit:"cover",objectPosition:"center",display:"block",filter:"sepia(0.28) saturate(0.62) brightness(0.88) contrast(1.06)" }} />
+          <div style={{ position:"absolute",inset:0,background:"rgba(74,4,4,.18)",mixBlendMode:"multiply",pointerEvents:"none" }} />
+          <div style={{ position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(26,20,16,.2) 0%,transparent 35%,transparent 65%,rgba(26,20,16,.45) 100%)",pointerEvents:"none" }} />
+          <div style={{ position:"absolute",bottom:20,right:20,background:"var(--parchment)",padding:"6px 12px",border:"1px solid var(--bordeaux)" }}>
+            <div className="mono" style={{ fontSize:9,letterSpacing:".22em",color:"var(--bordeaux)" }}>SCENE.N°003 · PAIRING ANALYSIS · MATCH 84%</div>
+          </div>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:0,borderTop:"1px solid var(--ink)" }}>
+          {[
+            { n:"DAY 1",title:"登録・審査",body:"プロフィールを登録すると、Cheese Academy のチームが内容を確認します。生産物のサンプル情報や出荷実績をもとに、プラットフォームの品質基準を確認します。",items:["プロフィール入力（15分）","生産物情報の提出","審査（通常24時間以内）"] },
+            { n:"DAY 2",title:"フレーバー入力",body:"専用フォームでチーズ・ビールのフレーバープロファイルを詳細に登録します。AIが自動でマトリクスを構築し、相性スコアの算出準備を行います。",items:["フレーバー診断ツール","生産量・ロット設定","出荷可能エリア設定"] },
+            { n:"DAY 3",title:"マッチング開始",body:"アルゴリズムが候補を選定し、最初の提案が届きます。相手方のプロフィールを確認し、関心があれば接触申請を送るだけです。",items:["提案受信（3〜5件）","相手プロフィール閲覧","接触申請・メッセージ"] },
+          ].map((step,i) => {
+            const [hover, setHover] = useState(false);
+            return (
+              <div key={i} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+                style={{ padding:"52px 44px",borderRight:i<2?"1px solid var(--rule)":"none",background:hover?"var(--cream-soft)":"transparent",transition:"background .35s",cursor:"default" }}>
+                <div className="mono" style={{ fontSize:9,letterSpacing:".28em",color:"var(--bordeaux)",marginBottom:20 }}>{step.n}</div>
+                <h3 className="serif-jp" style={{ margin:"0 0 20px",fontSize:26,fontWeight:500,color:"var(--ink)" }}>{step.title}</h3>
+                <p style={{ margin:"0 0 28px",fontSize:14,lineHeight:1.85,color:"var(--ink-2)" }}>{step.body}</p>
+                <div style={{ borderTop:"1px solid var(--rule-soft)",paddingTop:20,display:"flex",flexDirection:"column",gap:10 }}>
+                  {step.items.map((item,j) =>
+                    <div key={j} style={{ display:"flex",gap:12,alignItems:"baseline",fontSize:13,color:"var(--ink-2)" }}>
+                      <span className="mono" style={{ fontSize:9,color:"var(--amber-2)",letterSpacing:".18em",minWidth:16 }}>—</span>
+                      <span>{item}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PageCTA() {
+  return (
+    <section style={{ padding:"160px 48px",background:"var(--cream)",position:"relative",overflow:"hidden" }}>
+      <div style={{ position:"absolute",top:-40,right:-40,opacity:.08 }}>
+        <svg width="480" height="480" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="var(--bordeaux)" strokeWidth=".6" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bordeaux)" strokeWidth=".4" />
+          <text x="50" y="46" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="18" fill="var(--bordeaux)" fontStyle="italic">CA</text>
+        </svg>
+      </div>
+      <div style={{ maxWidth:960,margin:"0 auto",textAlign:"center",position:"relative" }}>
+        <div className="mono" style={{ fontSize:11,letterSpacing:".28em",color:"var(--bordeaux)",marginBottom:32 }}>TERROIR · MATCHING · 2026</div>
+        <h2 className="serif-jp" style={{ margin:0,fontSize:"clamp(48px,5.5vw,88px)",lineHeight:1.1,fontWeight:400 }}>
+          技術は、<br />
+          <span style={{ fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",color:"var(--bordeaux)",fontWeight:500 }}>市場になる。</span>
+        </h2>
+        <p style={{ marginTop:36,fontSize:17,lineHeight:2,color:"var(--ink-2)",maxWidth:600,margin:"36px auto 0" }}>
+          あなたのチーズ、あなたのビールに最適な相手が、今日もデータの中で待っています。登録は無料です。
+        </p>
+        <div style={{ marginTop:52,display:"flex",gap:16,justifyContent:"center" }}>
+          <button style={{ ...btnFilled,padding:"18px 32px",fontSize:14 }}>生産者として登録 →</button>
+          <button style={{ ...btnGhost,padding:"17px 30px",fontSize:14 }}>ブルワリーとして登録</button>
+        </div>
+        <div className="serif" style={{ fontStyle:"italic",fontSize:14,color:"var(--bordeaux)",marginTop:36 }}>— Cheese Academy Tokyo</div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer style={{ background:"var(--ink)",color:"var(--parchment)",padding:"80px 48px 36px" }}>
+      <div style={{ maxWidth:1440,margin:"0 auto" }}>
+        <div style={{ display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr",gap:40,paddingBottom:60,borderBottom:"1px solid rgba(253,253,245,.18)" }}>
+          <div>
+            <Logo dark />
+            <p style={{ marginTop:20,fontSize:13,lineHeight:1.9,color:"rgba(253,253,245,.6)",maxWidth:360,whiteSpace:"pre-line" }}>
+              日本のテロワールを、学習と経営のプラットフォームに。{"\n"}2026年、Tokyo より始動。
+            </p>
+          </div>
+          {[
+            ["PRODUCT",[["Academy","academy.html"],["Terroir Matching","terroir-matching.html"],["AI Mentor","ai-mentor.html"],["Pricing","academy.html#pricing"]]],
+            ["COMPANY",[["About","#"],["Team","#"],["Press","#"],["Careers","#"]]],
+            ["RESOURCES",[["Journal","#"],["Research","#"],["Partners","#"],["Guide","#"]]],
+            ["CONTACT",[["hello@cheese.ac","#"],["Privacy","#"],["Terms","#"],["Sitemap","#"]]],
+          ].map(([h,items],i) =>
+            <div key={i}>
+              <div className="mono" style={{ fontSize:10,letterSpacing:".26em",color:"var(--cream)" }}>{h}</div>
+              <ul style={{ listStyle:"none",padding:0,margin:"16px 0 0",display:"flex",flexDirection:"column",gap:10 }}>
+                {items.map(([label,href],j) =>
+                  <li key={j}><a href={href} style={{ color:"rgba(253,253,245,.75)",fontSize:13,textDecoration:"none" }}>{label}</a></li>
+                )}
+              </ul>
+            </div>
+          )}
+        </div>
+        <div style={{ paddingTop:32,display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+          <div className="mono" style={{ fontSize:10,letterSpacing:".2em",color:"rgba(253,253,245,.4)" }}>© 2026 CHEESE ACADEMY TOKYO · ALL RIGHTS RESERVED</div>
+          <div className="serif" style={{ fontStyle:"italic",fontSize:14,color:"var(--cream)" }}>terroir · science · craft</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <Nav />
+      <Hero />
+      <HowItWorks />
+      <TwoSides />
+      <Algorithm />
+      <JoinFlow />
+      <PageCTA />
+      <Footer />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
